@@ -1,0 +1,5 @@
+{
+  "ext": "ts,js,jsx,tsx",
+  "exec": "ts-node src/server.ts",
+  "watch": ["*.*", "D:\\GitHub\\payload-discord\\dist\\*.*"]
+}
