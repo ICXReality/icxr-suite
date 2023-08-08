@@ -1,12 +1,12 @@
-import { buildConfig } from 'payload/config';
 import path from 'path';
+import { createDiscordPlugin } from "payload-discord";
+import { buildConfig } from 'payload/config';
 import Admins from './collections/Admins';
-import { createDiscordPlugin } from "payload-discord"
 import Events from './collections/Events';
-import payload from 'payload';
-import GoogleCalendar from './globals/GoogleCalendar';
-import Universities from './collections/Universities';
 import Projects from './collections/Projects';
+import Universities from './collections/Universities';
+import GoogleCalendar from './globals/GoogleCalendar';
+
 export default buildConfig({
   serverURL: 'http://localhost:3000',
   admin: {
@@ -26,10 +26,10 @@ export default buildConfig({
   },
   graphQL: {
     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
+    disable: true
   },
   plugins: [
     createDiscordPlugin({
-      payload: payload,
       options: {
         intents: []
       }

@@ -13,7 +13,8 @@ const Universities: CollectionConfig = {
         },
         {
             name: 'timezone',
-            type: 'text'
+            type: 'select',
+            options: Intl.supportedValuesOf('timeZone')
         },
         {
             name: 'website',

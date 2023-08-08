@@ -19,7 +19,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "payload": "^1.11.8",
-    "payload-discord": "link:../payload-discord"
+    "payload-discord": "link:..\\payload-discord"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",
