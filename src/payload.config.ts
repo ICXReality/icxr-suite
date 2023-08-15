@@ -6,11 +6,18 @@ import Events from './collections/Events';
 import Projects from './collections/Projects';
 import Universities from './collections/Universities';
 import GoogleCalendar from './globals/GoogleCalendar';
+import ICXR from './globals/ICXR';
+import { webpackIgnore } from './webpack-ignore';
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
   admin: {
     user: Admins.slug,
+    webpack: webpackIgnore(
+      path.resolve(__dirname, "./mocks/EmptyObject.js"),
+      ["./hooks/", "./discord/"],
+      ["util"]
+    )
   },
   collections: [
     Admins,
@@ -19,13 +26,13 @@ export default buildConfig({
     Projects
   ],
   globals: [
+    ICXR,
     GoogleCalendar
   ],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
   },
   graphQL: {
-    schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
     disable: true
   },
   plugins: [

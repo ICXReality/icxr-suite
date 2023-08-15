@@ -1,14 +1,17 @@
-// import { createGuildField } from "payload-discord";
 import { GlobalConfig } from "payload/types";
-import { SelectInput, useField } from "payload/components/forms";
+import { guildChannelField, guildField } from "payload-discord/dist/fields";
 
 const ICXR: GlobalConfig = {
-    slug: "icxr",
-    fields: [
-        // createGuildField({
-        //     name: "guild"
-        // })
-    ]
-}
+  slug: "icxr",
+  label: "ICXR",
+  fields: [
+    guildField({
+        name: "guild"
+    })
+  ],
+  typescript: {
+    interface: "ICXR",
+  },
+};
 
 export default ICXR;

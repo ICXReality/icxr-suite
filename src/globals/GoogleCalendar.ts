@@ -4,7 +4,10 @@ const GoogleCalendar: GlobalConfig = {
     slug: 'gcal',
     label: "Google Calendar",
     fields: [
-
+        {
+            name: "calendarId",
+            type: "text"
+        }
     ]
 }
 
