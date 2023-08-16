@@ -1,10 +1,12 @@
-import { CollectionConfig } from 'payload/types';
+import { CollectionConfig } from "payload/types";
 
 const Admins: CollectionConfig = {
-  slug: 'admins',
-  auth: true,
+  slug: "admins",
+  auth: {
+    useAPIKey: true,
+  },
   admin: {
-    useAsTitle: 'email',
+    useAsTitle: "email",
   },
   access: {
     read: () => true,

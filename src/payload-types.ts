@@ -15,7 +15,6 @@ export interface Config {
   };
   globals: {
     icxr: ICXR;
-    gcal: Gcal;
     discord: Discord;
   };
 }
@@ -23,6 +22,9 @@ export interface Admin {
   id: string;
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean;
+  apiKey?: string;
+  apiKeyIndex?: string;
   email: string;
   resetPasswordToken?: string;
   resetPasswordExpiration?: string;
@@ -38,16 +40,22 @@ export interface Event {
   publishDiscord: boolean;
   publishCalendar: boolean;
   status: 'Pending' | 'Approved' | 'Rejected';
-  type: string;
-  location?: string;
+  location: string;
   description?: string;
   startDate: string;
   endDate: string;
+  organizer?: {
+    university?: string | University;
+    contactName?: string;
+    contactEmail?: string;
+    formSubmission?: string;
+  };
   attendance: number;
   discordEvent?: {
     guild?: string;
     event?: string;
   };
+  googleCalendarId?: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -497,12 +505,22 @@ export interface Project {
 export interface ICXR {
   id: string;
   guild?: string;
-  updatedAt?: string;
-  createdAt?: string;
-}
-export interface Gcal {
-  id: string;
-  calendarId?: string;
+  google?: {
+    clientId?: string;
+    clientSecret?: string;
+    refreshToken?: string;
+    calendarId?: string;
+    eventRequestForm?: {
+      eventForm?: string;
+      nameId?: string;
+      locationId?: string;
+      descriptionId?: string;
+      startDateId?: string;
+      endDateId?: string;
+      contactNameId?: string;
+      contactEmailId?: string;
+    };
+  };
   updatedAt?: string;
   createdAt?: string;
 }

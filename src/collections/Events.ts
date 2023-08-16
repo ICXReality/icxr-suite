@@ -2,6 +2,7 @@ import { CollectionConfig } from "payload/types";
 import PublishHook from "../hooks/Events/Publish";
 import { guildEventField } from "payload-discord/dist/fields/guilds";
 import UnpublishHook from "../hooks/Events/Unpublish";
+import ImportResponsesEndpoint from "../endpoints/Events/ImportResponses";
 
 function isInFuture(value: any) {
   let isInFuture = new Date(value).getTime() > Date.now();
@@ -13,9 +14,12 @@ const Events: CollectionConfig = {
   admin: {
     useAsTitle: "name",
   },
+  endpoints: [
+    ImportResponsesEndpoint
+  ],
   hooks: {
     afterChange: [ PublishHook ],
-    afterDelete: [ UnpublishHook ]
+    beforeDelete: [ UnpublishHook ]
   },
   fields: [
     {
@@ -44,6 +48,7 @@ const Events: CollectionConfig = {
       defaultValue: "Pending",
       options: ["Pending", "Approved", "Rejected"],
     },
+    
     {
       name: "location",
       type: "text",
@@ -81,6 +86,30 @@ const Events: CollectionConfig = {
       ],
     },
     {
+      name: "organizer",
+      type: "group",
+      fields: [
+        {
+          name: "university",
+          type: "relationship",
+          relationTo: "universities"
+        },
+        {
+          name: "contactName",
+          type: "text",
+        },
+        {
+          name: "contactEmail",
+          type: "text"
+        },
+        {
+          name: "formSubmission",
+          type: "text",
+          index: true
+        }
+      ]
+    },
+    {
       name: "attendance",
       type: "number",
       required: true,
@@ -89,7 +118,12 @@ const Events: CollectionConfig = {
     guildEventField({
       name: "discordEvent",
       hidden: true
-    })
+    }),
+    {
+      name: "googleCalendarId",
+      type: "text",
+      hidden: true
+    }
   ],
 };
 
