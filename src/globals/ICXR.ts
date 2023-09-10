@@ -1,5 +1,5 @@
+import { guildField } from "@djfigs1/payload-discord/dist/fields";
 import { GlobalConfig } from "payload/types";
-import { guildChannelField, guildField } from "payload-discord/dist/fields";
 
 const ICXR: GlobalConfig = {
   slug: "icxr",

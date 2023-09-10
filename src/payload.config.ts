@@ -1,5 +1,5 @@
 import path from "path";
-import { createDiscordPlugin } from "payload-discord";
+import { createDiscordPlugin } from "@djfigs1/payload-discord";
 import { buildConfig } from "payload/config";
 import Admins from "./collections/Admins";
 import Events from "./collections/Events";

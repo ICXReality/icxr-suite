@@ -4,7 +4,7 @@ import {
   GuildScheduledEventPrivacyLevel,
 } from "discord.js";
 import payload from "payload";
-import { getDiscordClient } from "payload-discord/dist/discord/bot";
+import { getDiscordClient } from "@djfigs1/payload-discord/dist/discord/bot";
 import { Event } from "payload/generated-types";
 import { resolveDocument } from "../server/payload-util";
 

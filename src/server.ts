@@ -1,7 +1,7 @@
 import express from "express";
 import payload from "payload";
 import { Client } from "discord.js";
-import { initializeDiscordClient } from "payload-discord";
+import { initializeDiscordClient } from "@djfigs1/payload-discord";
 
 require("dotenv").config();
 const app = express();

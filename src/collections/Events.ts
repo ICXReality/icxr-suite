@@ -1,6 +1,6 @@
 import { CollectionConfig } from "payload/types";
 import PublishHook from "../hooks/Events/Publish";
-import { guildEventField } from "payload-discord/dist/fields/guilds";
+import { guildEventField } from "@djfigs1/payload-discord/dist/fields/guilds";
 import UnpublishHook from "../hooks/Events/Unpublish";
 import ImportResponsesEndpoint from "../endpoints/Events/ImportResponses";
 
