@@ -15,7 +15,7 @@ import {
 import payload from "payload";
 import { Event } from "payload/generated-types";
 import { resolveDocument } from "../server/payload-util";
-import { createEventEmbed, createEventMessage } from "./messages";
+import { createEventEmbed, createEventMessage, truncate } from "./messages";
 
 export type DiscordMessage =
   | string
@@ -46,15 +46,18 @@ export async function getICXRGuild(): Promise<Guild | null> {
  * @param guild The guild to publish the event to
  */
 async function updateGuildScheduledEvent(event: Event, guild: Guild) {
+  // Calculated truncated event details in case they are too long to fit within
+  // a scheduled event.
+
   let eventDetails = {
-    name: event.name,
+    name: truncate(event.name, 100),
     scheduledStartTime: event.startDate,
     scheduledEndTime: event.endDate,
-    description: event.description,
+    description: event.description ? truncate(event.description, 1000) : undefined,
     privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
     entityType: GuildScheduledEventEntityType.External,
     entityMetadata: {
-      location: event.location,
+      location: truncate(event.location, 100, "")
     },
     image: event.thumbnail,
   };

@@ -3,6 +3,15 @@ import moment from "moment";
 import { Event } from "payload/generated-types";
 import { DiscordMessage, createButtonRowComponents } from "./bot";
 
+export function truncate(str: string, maxChars: number, trail: string = "...") {
+  let maxLength = maxChars - trail.length
+  if (str.length > maxLength) {
+    str = str.substring(0, maxLength) + trail;
+  }
+  
+  return str;
+}
+
 export function createEventMessage(event: Event): DiscordMessage {
   let embed = createEventEmbed(event);
   let message: DiscordMessage = {
@@ -35,11 +44,11 @@ export function createEventEmbed(event: Event): EmbedBuilder {
   // Build an embed with all of the event information.
   let embed = new EmbedBuilder();
   embed.setColor("Purple");
-  embed.setTitle(event.name);
+  embed.setTitle(truncate(event.name, 256));
 
   // Add event description
   if (event.description) {
-    embed.setDescription(event.description);
+    embed.setDescription(truncate(event.description, 4096));
   }
 
   // Add event thumbnail (if it exists)
@@ -50,7 +59,7 @@ export function createEventEmbed(event: Event): EmbedBuilder {
   // Add event location
   embed.addFields({
     name: "Location",
-    value: event.location,
+    value: truncate(event.location, 1024),
     inline: false
   })
 
