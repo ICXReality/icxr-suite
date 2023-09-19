@@ -42,6 +42,7 @@ export interface Event {
   status: 'Pending' | 'Approved' | 'Rejected';
   location: string;
   description?: string;
+  thumbnail?: string;
   startDate: string;
   endDate: string;
   organizer?: {
@@ -54,6 +55,10 @@ export interface Event {
   discordEvent?: {
     guild?: string;
     event?: string;
+  };
+  discordMessage?: {
+    channel?: string;
+    message?: string;
   };
   googleCalendarId?: string;
   updatedAt: string;
@@ -492,6 +497,10 @@ export interface University {
     | 'Pacific/Wake'
     | 'Pacific/Wallis';
   website?: string;
+  emailDomains?: {
+    domain: string;
+    id?: string;
+  }[];
   updatedAt: string;
   createdAt: string;
 }
@@ -504,7 +513,10 @@ export interface Project {
 }
 export interface ICXR {
   id: string;
-  guild?: string;
+  discord?: {
+    guild?: string;
+    eventsChannel?: string;
+  };
   google?: {
     clientId?: string;
     clientSecret?: string;

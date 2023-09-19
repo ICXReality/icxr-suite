@@ -6,9 +6,9 @@ import { initializeDiscordClient } from "@djfigs1/payload-discord";
 require("dotenv").config();
 const app = express();
 
-// Redirect root to Admin panel
+// Redirect root to ICXR
 app.get("/", (_, res) => {
-  res.redirect("/admin");
+  res.redirect("https://icxr.org");
 });
 
 // Initialize Payload

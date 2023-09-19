@@ -1,13 +1,28 @@
-import { guildField } from "@djfigs1/payload-discord/dist/fields";
+import {
+  guildChannelField,
+  guildField,
+} from "@djfigs1/payload-discord/dist/fields";
 import { GlobalConfig } from "payload/types";
 
 const ICXR: GlobalConfig = {
   slug: "icxr",
   label: "ICXR",
   fields: [
-    guildField({
-      name: "guild",
-    }),
+    {
+      name: "discord",
+      type: "group",
+      fields: [
+        guildField({
+          name: "guild",
+        }),
+        guildChannelField({
+          name: "eventsChannel",
+          admin: {
+            description: "The channel where event embeds will be announced",
+          },
+        }),
+      ],
+    },
     {
       name: "google",
       label: "Google API",

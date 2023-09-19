@@ -1,6 +1,6 @@
 import { CollectionConfig } from "payload/types";
 import PublishHook from "../hooks/Events/Publish";
-import { guildEventField } from "@djfigs1/payload-discord/dist/fields/guilds";
+import { guildChannelField, guildEventField } from "@djfigs1/payload-discord/dist/fields/guilds";
 import UnpublishHook from "../hooks/Events/Unpublish";
 import ImportResponsesEndpoint from "../endpoints/Events/ImportResponses";
 
@@ -48,15 +48,38 @@ const Events: CollectionConfig = {
       defaultValue: "Pending",
       options: ["Pending", "Approved", "Rejected"],
     },
-    
     {
       name: "location",
       type: "text",
       required: true
     },
     {
+      name: "locationType",
+      type: "radio",
+      options: [
+        {
+          label: "In Person",
+          value: "irl"
+        },
+        {
+          label: "Hybrid",
+          value: "hybrid"
+        },
+        {
+          label: "Online",
+          value: "online"
+        }
+      ],
+      required: true,
+      defaultValue: "hybrid"
+    },
+    {
       name: "description",
       type: "textarea",
+    },
+    {
+      name: "thumbnail",
+      type: "text"
     },
     {
       type: "row",
@@ -119,6 +142,20 @@ const Events: CollectionConfig = {
       name: "discordEvent",
       hidden: true
     }),
+    {
+      name:"discordMessage",
+      hidden: true,
+      type: "group",
+      fields: [
+        guildChannelField({
+          name: "channel"
+        }),
+        {
+          name: "message",
+          type: "text"
+        }
+      ]
+    },
     {
       name: "googleCalendarId",
       type: "text",

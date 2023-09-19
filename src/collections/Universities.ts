@@ -19,6 +19,17 @@ const Universities: CollectionConfig = {
         {
             name: 'website',
             type: 'text',
+        },
+        {
+            name: 'emailDomains',
+            type: 'array',
+            fields: [
+                {
+                    name: 'domain',
+                    type: 'text',
+                    required: true
+                }
+            ]
         }
     ]
 }

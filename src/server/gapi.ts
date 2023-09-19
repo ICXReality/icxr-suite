@@ -111,23 +111,27 @@ export async function updateCalendarWithEvent(
   // A calendar event needs to be created, either because one does not exist
   // yet or a calendar event failed to be edited.
   if (shouldCreateNewEvent) {
-    let createdEvent = await calendar.events.insert({
-      calendarId: calendarId,
-      requestBody: eventData,
-    });
+    try {
+      let createdEvent = await calendar.events.insert({
+        calendarId: calendarId,
+        requestBody: eventData,
+      });
 
-    event = await payload.update({
-      id: event.id,
-      collection: "events",
-      data: {
-        googleCalendarId: createdEvent.data.id ?? undefined,
-      },
-      context: {
-        noHook: true,
-      },
-      showHiddenFields: true,
-      overrideAccess: true,
-    });
+      event = await payload.update({
+        id: event.id,
+        collection: "events",
+        data: {
+          googleCalendarId: createdEvent.data.id ?? undefined,
+        },
+        context: {
+          noHook: true,
+        },
+        showHiddenFields: true,
+        overrideAccess: true,
+      });
+    } catch (e) {
+      payload.logger.error("Failed to create calendar event: " + e)
+    }
   }
 
   return event;
@@ -206,7 +210,7 @@ export async function retrieveFormResponses() {
   return responses;
 }
 
-export async function createEventsFromResponses() {
+export async function importEventFormResponses() {
   let responses = await retrieveFormResponses();
   let icxrConfig = await payload.findGlobal({ slug: "icxr" });
 
