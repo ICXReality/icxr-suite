@@ -269,6 +269,7 @@ export async function importEventFormResponses() {
           publishCalendar: true,
           publishDiscord: true,
           status: "Pending",
+          locationType: "hybrid",
           attendance: 0,
           location: getFormAnswer(locationId)!,
           description: getFormAnswer(descriptionId),

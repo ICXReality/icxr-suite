@@ -1,12 +1,31 @@
 import { getDiscordClient } from "@djfigs1/payload-discord/dist/discord/bot";
 import {
-  EmbedBuilder,
-  Guild
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  Channel,
+  Guild,
+  GuildScheduledEventEntityType,
+  GuildScheduledEventPrivacyLevel,
+  Message,
+  MessageCreateOptions,
+  MessageEditOptions,
+  MessagePayload,
 } from "discord.js";
 import payload from "payload";
 import { Event } from "payload/generated-types";
 import { resolveDocument } from "../server/payload-util";
-import moment from "moment";
+import { createEventEmbed, createEventMessage } from "./messages";
+
+export type DiscordMessage =
+  | string
+  | MessagePayload
+  | (MessageCreateOptions & MessageEditOptions);
+export type NewDiscordMessage = string | MessagePayload | MessageCreateOptions;
+export type EditableDiscordMessage =
+  | string
+  | MessagePayload
+  | MessageEditOptions;
 
 export async function getICXRGuild(): Promise<Guild | null> {
   let client = getDiscordClient();
@@ -26,18 +45,18 @@ export async function getICXRGuild(): Promise<Guild | null> {
  * @param event The event to reference in the guild event
  * @param guild The guild to publish the event to
  */
-async function updateGuildEvent(event: Event, guild: Guild) {
+async function updateGuildScheduledEvent(event: Event, guild: Guild) {
   let eventDetails = {
     name: event.name,
     scheduledStartTime: event.startDate,
     scheduledEndTime: event.endDate,
     description: event.description,
-    privacyLevel: 2, // GuildScheduledEventPrivacyLevel.GuildOnly, <-- THESE ENUMS CAUSE IMPORT ERRORS. WHY? I DUNNO
-    entityType: 3, // GuildScheduledEventEntityType.External,
+    privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+    entityType: GuildScheduledEventEntityType.External,
     entityMetadata: {
       location: event.location,
     },
-    image: event.thumbnail
+    image: event.thumbnail,
   };
 
   // Edit the event if one already exists.
@@ -91,14 +110,28 @@ export async function removeEventFromGuild(event: string | Event) {
       }
     }
   }
+
+  // Remove an event event if one was created.
+  if (event.discordMessage?.channel && event.discordMessage.message) {
+    let message = await fetchChannelMessage(
+      event.discordMessage.channel,
+      event.discordMessage.message
+    );
+    if (message) {
+      await message.delete();
+    }
+  }
 }
 
-async function updateGuildEventEmbed(event: Event, guild: Guild): Promise<Event> {
-  let config = await payload.findGlobal({slug: "icxr"})
+async function updateGuildEventEmbedMessage(
+  event: Event,
+  guild: Guild
+): Promise<Event> {
+  let config = await payload.findGlobal({ slug: "icxr" });
   let client = await getDiscordClient();
   if (!client) return event;
 
-  let eventsChannel = config.discord?.eventsChannel
+  let eventsChannel = config.discord?.eventsChannel;
   if (!eventsChannel) return event;
   let channel;
   try {
@@ -108,81 +141,43 @@ async function updateGuildEventEmbed(event: Event, guild: Guild): Promise<Event>
     return event;
   }
 
-  // Build an embed with all of the event information.
-  let embed = new EmbedBuilder();
-  embed.setColor("Purple");
-  embed.setTitle(event.name)
-
-  // Add event description
-  if (event.description) {
-    embed.setDescription(event.description);
-  }
-
-  // Add event thumbnail (if it exists)
-  if (event.thumbnail) {
-    embed.setImage(event.thumbnail)
-  }
-
-  let startMoment = moment(event.startDate);
-  let endMoment = moment(event.endDate);
-
-  // Add event information
-  let when: string;
-  if (startMoment.isSame(endMoment, "date")) {
-    let startDate = startMoment.format("dddd, MMMM Do YYYY");
-    let startTime = startMoment.format("h:mm A");
-    let endTime = endMoment.format("h:mm A");
-    let date = `${startDate} from ${startTime} - ${endTime}`;
-    when = date;
-  } else {
-    when = "Long range"
-  }
-
-  embed.addFields({
-    name: "When",
-    value: when,
-  });
+  let eventMessageData = createEventMessage(event);
 
   // Attempt to see if there is an event message already existing, and if so,
   // edit it with the new embed.
-  var shouldCreateNewMessage = true
-  if (event.discordMessage?.channel && event.discordMessage.message)
-  {
-    try {
-      let existingChannel = (await client.channels.fetch(event.discordMessage.channel))!;
-      if (existingChannel.isTextBased()) {
-        let existingMessage = await existingChannel.messages.fetch(event.discordMessage.message);
-        existingMessage.edit({embeds: [embed]})
-        shouldCreateNewMessage = false;
-      }
-    } catch {
-      shouldCreateNewMessage = true;
-    }
+  var shouldCreateNewMessage = true;
+  if (event.discordMessage?.channel && event.discordMessage.message) {
+    let editResult = await editChannelMessage(
+      event.discordMessage.channel,
+      event.discordMessage.message,
+      eventMessageData
+    );
+    shouldCreateNewMessage = editResult === null;
   }
 
   // If we need to create a new message, do so and save the resulting message
   // id.
   if (shouldCreateNewMessage && channel.isTextBased()) {
-    let sentMessage = await channel.send({ embeds: [embed] })
+    let sentMessage = await channel.send(eventMessageData);
     await payload.update({
-      collection: 'events',
+      collection: "events",
       id: event.id,
       data: {
         discordMessage: {
           message: sentMessage.id,
-          channel: sentMessage.channelId
-        }
+          channel: sentMessage.channelId,
+        },
       },
       context: {
-        noHook: true
-      }
-    })
+        noHook: true,
+      },
+    });
   }
 
   return event;
 }
 
-export async function updateEventOnDiscord(
+export async function publishEventOnDiscord(
   event: string | Event
 ): Promise<Event> {
   event = await resolveDocument(event, "events");
@@ -191,8 +186,152 @@ export async function updateEventOnDiscord(
   // Ensure that we have a guild to publish the event to.
   if (!guild) return event;
 
-  event = await updateGuildEvent(event, guild);
-  event = await updateGuildEventEmbed(event, guild);
+  // We update the scheduled event first and retrieve the updated event such
+  // that an event embed message can refer to the scheduled event via a button
+  // or link.
+  event = await updateGuildScheduledEvent(event, guild);
+  event = await updateGuildEventEmbedMessage(event, guild);
 
   return event;
+}
+
+export async function sendDiscordAuditMessage(
+  message: DiscordMessage
+): Promise<Message | null> {
+  // Make sure we have an audit channel id to write to.
+  let config = await payload.findGlobal({ slug: "icxr" });
+  let auditChannelId = config.discord?.auditChannel;
+  if (!auditChannelId) return null;
+
+  let sentMessage = await sendChannelMessage(message, auditChannelId);
+
+  return sentMessage;
+}
+
+/**
+ * Attempts to send a message via the ICXR client to a specified channel id.
+ * If the message could not be sent, this will return null.
+ *
+ * @param message The message to send
+ * @param channelId The id of the channel to put the message
+ * @returns The sent message (or null if none sent)
+ */
+export async function sendChannelMessage(
+  message: DiscordMessage,
+  channelId: string
+): Promise<Message | null> {
+  let client = await getDiscordClient();
+
+  // Make sure we have a client to send a message through.
+  if (!client) return null;
+
+  let channel: Channel | null;
+  try {
+    channel = await client.channels.fetch(channelId);
+  } catch {
+    payload.logger.error("Failed to fetch audit channel from id!");
+    channel = null;
+  }
+
+  // Ensure that we have a valid channel and that it is text based.
+  if (!(channel && channel.isTextBased())) return null;
+
+  let sentMessage = await channel.send(message);
+
+  return sentMessage;
+}
+
+export async function fetchChannelMessage(
+  channelId: string,
+  messageId: string
+) {
+  let client = await getDiscordClient();
+
+  // Make sure we have a client to send a message through.
+  if (!client) return null;
+
+  let channel: Channel | null;
+  try {
+    channel = await client.channels.fetch(channelId);
+  } catch {
+    payload.logger.error("Failed to fetch audit channel from id!");
+    channel = null;
+  }
+
+  // Ensure that we have a valid channel and that it is text based.
+  if (!(channel && channel.isTextBased())) return null;
+
+  let message: Message | null;
+  try {
+    message = await channel.messages.fetch(messageId);
+  } catch {
+    message = null;
+    payload.logger.error("Failed to fetch message from id!");
+  }
+
+  return message;
+}
+
+export async function editChannelMessage(
+  channelId: string,
+  messageId: string,
+  content: EditableDiscordMessage
+): Promise<Message | null> {
+  let messageToEdit = await fetchChannelMessage(channelId, messageId);
+  if (!messageToEdit) return null;
+
+  let newMessage: Message | null;
+  try {
+    newMessage = await messageToEdit.edit(content);
+  } catch {
+    payload.logger.error("Failed to edit message!");
+    newMessage = null;
+  }
+
+  return newMessage;
+}
+
+type DiscordButton = {
+  style: ButtonStyle;
+  label: string;
+  customId?: string;
+  url?: string;
+  emoji?: string;
+};
+
+export function createButtonRowComponents(
+  buttons: DiscordButton[]
+): ActionRowBuilder<ButtonBuilder>[] {
+  let maxRows = 5;
+  let maxButtonsPerRow = 5;
+  let totalButtons = Math.min(buttons.length, maxRows * maxButtonsPerRow);
+
+  let numRows = Math.min(5, Math.ceil(buttons.length / 5));
+  let rows: ActionRowBuilder<ButtonBuilder>[] = [];
+  for (var r = 0; r < numRows; r++) {
+    let rowStart = maxButtonsPerRow * r;
+    let rowEnd = Math.min(rowStart + maxButtonsPerRow, totalButtons);
+    let row = new ActionRowBuilder<ButtonBuilder>();
+
+    for (var i = rowStart; i < rowEnd; i++) {
+      let button = buttons[i];
+      row.addComponents(createButton(button));
+    }
+
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+export function createButton(button: DiscordButton) {
+  let builder = new ButtonBuilder();
+
+  builder = builder.setStyle(button.style);
+  builder = builder.setLabel(button.label);
+  if (button.customId) builder = builder.setCustomId(button.customId);
+  if (button.url) builder = builder.setURL(button.url);
+  if (button.emoji) builder = builder.setEmoji(button.emoji);
+
+  return builder;
 }

@@ -3,6 +3,7 @@ import PublishHook from "../hooks/Events/Publish";
 import { guildChannelField, guildEventField } from "@djfigs1/payload-discord/dist/fields/guilds";
 import UnpublishHook from "../hooks/Events/Unpublish";
 import ImportResponsesEndpoint from "../endpoints/Events/ImportResponses";
+import NotifyCreationHook from "../hooks/Events/NotifyCreation";
 
 function isInFuture(value: any) {
   let isInFuture = new Date(value).getTime() > Date.now();
@@ -18,8 +19,8 @@ const Events: CollectionConfig = {
     ImportResponsesEndpoint
   ],
   hooks: {
-    afterChange: [ PublishHook ],
-    beforeDelete: [ UnpublishHook ]
+    afterChange: [ PublishHook, NotifyCreationHook ],
+    beforeDelete: [ UnpublishHook ],
   },
   fields: [
     {

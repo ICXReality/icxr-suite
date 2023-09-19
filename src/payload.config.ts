@@ -7,6 +7,7 @@ import Projects from "./collections/Projects";
 import Universities from "./collections/Universities";
 import ICXR from "./globals/ICXR";
 import { webpackIgnore } from "./webpack-ignore";
+import Media from "./collections/Media";
 
 export default buildConfig({
   serverURL: "http://localhost:3000",
@@ -18,7 +19,7 @@ export default buildConfig({
       ["util"]
     ),
   },
-  collections: [Admins, Events, Universities, Projects],
+  collections: [Admins, Events, Universities, Projects, Media],
   globals: [ICXR],
   typescript: {
     outputFile: path.resolve(__dirname, "payload-types.ts"),

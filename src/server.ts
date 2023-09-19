@@ -1,7 +1,9 @@
 import express from "express";
 import payload from "payload";
-import { Client } from "discord.js";
+import { ButtonStyle, Client } from "discord.js";
 import { initializeDiscordClient } from "@djfigs1/payload-discord";
+import { createButtonRowComponents, sendDiscordAuditMessage } from "./discord/bot";
+import { createVRChatSessionEmbed } from "./discord/messages";
 
 require("dotenv").config();
 const app = express();
@@ -32,7 +34,6 @@ payload.init({
       client.on("ready", () => {
         console.log("Logged in as: " + client.user?.displayName);
       });
-
       return client;
     });
   },

@@ -23,7 +23,8 @@
     "googleapis": "^125.0.0",
     "moment": "^2.29.4",
     "node-schedule": "^2.1.1",
-    "payload": "^1.15.6"
+    "payload": "^1.15.6",
+    "vrchat": "^1.13.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",

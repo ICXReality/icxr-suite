@@ -12,6 +12,11 @@ const Universities: CollectionConfig = {
             required: true
         },
         {
+            name: 'universityName',
+            type: 'text',
+            required: true
+        },
+        {
             name: 'timezone',
             type: 'select',
             options: Intl.supportedValuesOf('timeZone')

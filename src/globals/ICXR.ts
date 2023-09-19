@@ -21,6 +21,12 @@ const ICXR: GlobalConfig = {
             description: "The channel where event embeds will be announced",
           },
         }),
+        guildChannelField({
+          name: "auditChannel",
+          admin: {
+            description: "The channel where audit messages will be sent."
+          }
+        })
       ],
     },
     {

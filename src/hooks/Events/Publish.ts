@@ -1,6 +1,6 @@
 import { AfterChangeHook } from "payload/dist/collections/config/types";
 import { Event } from "payload/generated-types";
-import { updateEventOnDiscord } from "../../discord/bot";
+import { publishEventOnDiscord } from "../../discord/bot";
 import { updateCalendarWithEvent } from "../../server/gapi";
 
 const PublishHook: AfterChangeHook<Event> = async (args) => {
@@ -14,7 +14,7 @@ const PublishHook: AfterChangeHook<Event> = async (args) => {
   // created already.
   if (event.status == "Approved") {
     if (event.publishDiscord) {
-      event = await updateEventOnDiscord(event);
+      event = await publishEventOnDiscord(event);
     }
 
     if (event.publishCalendar) {

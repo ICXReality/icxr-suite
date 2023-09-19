@@ -41,6 +41,7 @@ export interface Event {
   publishCalendar: boolean;
   status: 'Pending' | 'Approved' | 'Rejected';
   location: string;
+  locationType: 'irl' | 'hybrid' | 'online';
   description?: string;
   thumbnail?: string;
   startDate: string;
@@ -516,6 +517,7 @@ export interface ICXR {
   discord?: {
     guild?: string;
     eventsChannel?: string;
+    auditChannel?: string;
   };
   google?: {
     clientId?: string;
