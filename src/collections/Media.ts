@@ -6,15 +6,32 @@ import { CollectionConfig } from "payload/types";
 export const MediaDirectory = "./media";
 
 const Media: CollectionConfig = {
-    slug: "media",
-    fields: [
+  slug: "media",
+  access: {
+    read: (args) => {
+      if (args.req.user) {
+        return true;
+      }
 
-    ],
-    upload: {
-        staticURL: "/media",
-        staticDir: "../" + MediaDirectory,
-        mimeTypes: ['image/*', 'audio/*']
-    }
-}
+      return {
+        isPublic: {
+            equals: true
+        }
+      }
+    },
+  },
+  fields: [
+    {
+      name: "isPublic",
+      type: "checkbox",
+      defaultValue: true,
+    },
+  ],
+  upload: {
+    staticURL: "/media",
+    staticDir: "../" + MediaDirectory,
+    mimeTypes: ["image/*", "audio/*"],
+  },
+};
 
 export default Media;

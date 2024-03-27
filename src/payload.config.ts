@@ -8,10 +8,14 @@ import Universities from "./collections/Universities";
 import ICXR from "./globals/ICXR";
 import { webpackIgnore } from "./webpack-ignore";
 import Media from "./collections/Media";
+import { webpackBundler } from "@payloadcms/bundler-webpack";
+import { mongooseAdapter } from "@payloadcms/db-mongodb";
+import { lexicalEditor } from "@payloadcms/richtext-lexical";
 
 export default buildConfig({
   serverURL: "http://localhost:3000",
   admin: {
+    bundler: webpackBundler(),
     user: Admins.slug,
     webpack: webpackIgnore(
       path.resolve(__dirname, "./mocks/EmptyObject.js"),
@@ -27,6 +31,10 @@ export default buildConfig({
   graphQL: {
     disable: true,
   },
+  db: mongooseAdapter({
+    url: process.env.MONGO_URL!
+  }),
+  editor: lexicalEditor({}),
   plugins: [
     createDiscordPlugin({
       options: {
