@@ -13,7 +13,7 @@ import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 
 export default buildConfig({
-  serverURL: "http://localhost:3000",
+  serverURL: process.env.PUBLIC_URL,
   admin: {
     bundler: webpackBundler(),
     user: Admins.slug,
