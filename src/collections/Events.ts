@@ -1,7 +1,7 @@
 import {
   guildChannelField,
   guildEventField,
-} from "@djfigs1/payload-discord/dist/fields/guilds";
+} from "@xrclub/payload-discord/dist/fields/guilds";
 import { CollectionConfig } from "payload/types";
 import {
   EventAfterDeleteHook,

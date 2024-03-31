@@ -1,4 +1,4 @@
-import { getDiscordClient } from "@djfigs1/payload-discord/dist/discord/bot";
+import { getDiscordClient } from "@xrclub/payload-discord/dist/discord/bot";
 import {
   ActionRowBuilder,
   ButtonBuilder,

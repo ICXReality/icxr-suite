@@ -1,4 +1,4 @@
-import { initializeDiscordClient } from "@djfigs1/payload-discord";
+import { initializeDiscordClient } from "@xrclub/payload-discord";
 import { Client } from "discord.js";
 import express from "express";
 import payload from "payload";
@@ -20,7 +20,7 @@ payload.init({
   onInit: async () => {
     payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`);
     await ICXR.init()
-    
+
     initializeDiscordClient(async () => {
       var client = new Client({
         intents: [
