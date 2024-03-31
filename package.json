@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@xrclub/payload-discord": "^1.0.2",
-    "@xrclub/club.js": "^1.0.2",
+    "@xrclub/club.js": "^1.0.3",
     "@payloadcms/bundler-webpack": "^1.0.5",
     "@payloadcms/db-mongodb": "^1.1.1",
     "@payloadcms/richtext-lexical": "^0.5.0",
