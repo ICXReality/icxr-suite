@@ -48,15 +48,50 @@ export interface Admin {
 export interface Event {
   id: string;
   name: string;
-  publishDiscord: boolean;
-  publishCalendar: boolean;
-  status: 'Pending' | 'Approved' | 'Rejected';
-  location: string;
-  locationType: 'irl' | 'hybrid' | 'online';
+  isPublished: boolean;
+  location?: {
+    irl?: string | null;
+    online?: string | null;
+  };
   description?: string | null;
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
   thumbnail?: string | null;
   startDate: string;
   endDate: string;
+  discord: {
+    createGuildEvent: boolean;
+    createEmbedMessage: boolean;
+    mentionNotificationRoles: boolean;
+    eventMessages?:
+      | {
+          messageId: string;
+          channelId: string;
+          id?: string | null;
+        }[]
+      | null;
+    guildEvents?:
+      | {
+          eventId: string;
+          guildId: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  gcal: {
+    publishOnGCal: boolean;
+    events?:
+      | {
+          eventId: string;
+          calendarId: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   organizer?: {
     university?: (string | null) | University;
     contactName?: string | null;
@@ -83,7 +118,17 @@ export interface Event {
 export interface University {
   id: string;
   name: string;
-  universityName: string;
+  website?: string | null;
+  logo?: string | Media | null;
+  university: {
+    name: string;
+    logo?: string | Media | null;
+    /**
+     * @minItems 2
+     * @maxItems 2
+     */
+    location?: [number, number] | null;
+  };
   timezone?:
     | (
         | 'Africa/Abidjan'
@@ -516,24 +561,12 @@ export interface University {
         | 'Pacific/Wallis'
       )
     | null;
-  website?: string | null;
   emailDomains?:
     | {
         domain: string;
         id?: string | null;
       }[]
     | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects".
- */
-export interface Project {
-  id: string;
-  name: string;
-  university: string | University;
   updatedAt: string;
   createdAt: string;
 }
@@ -552,6 +585,17 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: string;
+  name: string;
+  university: string | University;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -597,6 +641,16 @@ export interface ICXR {
     guild?: string | null;
     eventsChannel?: string | null;
     auditChannel?: string | null;
+    notificationRoles?:
+      | {
+          tag: string;
+          role?: {
+            guild?: string | null;
+            role?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
   };
   google?: {
     clientId?: string | null;

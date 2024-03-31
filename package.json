@@ -16,18 +16,20 @@
     "gauth": "ts-node src/server/google-oauth.ts"
   },
   "dependencies": {
-    "@djfigs1/payload-discord": "^1.0.1",
-    "discord.js": "^14.12.1",
+    "@xrclub/payload-discord": "^1.0.2",
+    "@xrclub/club.js": "^1.0.2",
+    "@payloadcms/bundler-webpack": "^1.0.5",
+    "@payloadcms/db-mongodb": "^1.1.1",
+    "@payloadcms/richtext-lexical": "^0.5.0",
+    
+    "discord.js": "^14.13.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "googleapis": "^125.0.0",
     "moment": "^2.29.4",
     "node-schedule": "^2.1.1",
     "payload": "^2.5.0",
-    "vrchat": "^1.13.0",
-    "@payloadcms/bundler-webpack": "^1.0.5",
-    "@payloadcms/db-mongodb": "^1.1.1",
-    "@payloadcms/richtext-lexical": "^0.5.0"
+    "vrchat": "^1.13.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",

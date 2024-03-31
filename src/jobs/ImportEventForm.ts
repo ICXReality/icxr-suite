@@ -1,9 +1,9 @@
-import { importEventFormResponses } from "../server/gapi";
-import { Job } from "./JobScheduler";
+// import { importEventFormResponses } from "../server/gapi";
+// import { Job } from "./JobScheduler";
 
-export const ImportEventFormJob: Job = {
-    cron: "0 * * * *",
-    handler: async () => {
-        await importEventFormResponses();
-    }
-}
+// export const ImportEventFormJob: Job = {
+//     cron: "0 * * * *",
+//     handler: async () => {
+//         await importEventFormResponses();
+//     }
+// }

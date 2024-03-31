@@ -1,8 +1,12 @@
+import {
+  guildChannelField,
+  guildEventField,
+} from "@djfigs1/payload-discord/dist/fields/guilds";
 import { CollectionConfig } from "payload/types";
-import PublishHook from "../hooks/Events/Publish";
-import { guildChannelField, guildEventField } from "@djfigs1/payload-discord/dist/fields/guilds";
-import UnpublishHook from "../hooks/Events/Unpublish";
-import ImportResponsesEndpoint from "../endpoints/Events/ImportResponses";
+import {
+  EventAfterDeleteHook,
+  EventBeforeChangeHook,
+} from "../hooks/Events/EventTransform";
 import NotifyCreationHook from "../hooks/Events/NotifyCreation";
 
 function isInFuture(value: any) {
@@ -15,12 +19,11 @@ const Events: CollectionConfig = {
   admin: {
     useAsTitle: "name",
   },
-  endpoints: [
-    ImportResponsesEndpoint
-  ],
+  endpoints: [],
   hooks: {
-    afterChange: [ PublishHook, NotifyCreationHook ],
-    beforeDelete: [ UnpublishHook ],
+    beforeChange: [EventBeforeChangeHook],
+    afterChange: [NotifyCreationHook],
+    afterDelete: [EventAfterDeleteHook],
   },
   fields: [
     {
@@ -29,58 +32,42 @@ const Events: CollectionConfig = {
       required: true,
     },
     {
-      name: "publishDiscord",
+      name: "isPublished",
       type: "checkbox",
-      label: "Publish event on Discord",
       required: true,
-      defaultValue: true,
-    },
-    {
-      name: "publishCalendar",
-      type: "checkbox",
-      label: "Publish event on Google Calendar",
-      required: true,
-      defaultValue: true,
-    },
-    {
-      name: "status",
-      type: "select",
-      required: true,
-      defaultValue: "Pending",
-      options: ["Pending", "Approved", "Rejected"],
     },
     {
       name: "location",
-      type: "text",
-      required: true
-    },
-    {
-      name: "locationType",
-      type: "radio",
-      options: [
+      type: "group",
+      fields: [
         {
-          label: "In Person",
-          value: "irl"
+          name: "irl",
+          type: "text",
         },
         {
-          label: "Hybrid",
-          value: "hybrid"
+          name: "online",
+          type: "text",
         },
-        {
-          label: "Online",
-          value: "online"
-        }
       ],
-      required: true,
-      defaultValue: "hybrid"
     },
     {
       name: "description",
       type: "textarea",
     },
     {
+      name: "tags",
+      type: "array",
+      fields: [
+        {
+          name: "tag",
+          type: "text",
+          required: true,
+        },
+      ],
+    },
+    {
       name: "thumbnail",
-      type: "text"
+      type: "text",
     },
     {
       type: "row",
@@ -91,10 +78,10 @@ const Events: CollectionConfig = {
           required: true,
           admin: {
             date: {
-              pickerAppearance: "dayAndTime"
-            }
+              pickerAppearance: "dayAndTime",
+            },
           },
-          validate: isInFuture
+          validate: isInFuture,
         },
         {
           name: "endDate",
@@ -102,10 +89,94 @@ const Events: CollectionConfig = {
           required: true,
           admin: {
             date: {
-              pickerAppearance: "dayAndTime"
-            }
+              pickerAppearance: "dayAndTime",
+            },
           },
-          validate: isInFuture
+          validate: isInFuture,
+        },
+      ],
+    },
+    {
+      name: "discord",
+      type: "group",
+      fields: [
+        {
+          type: "checkbox",
+          name: "createGuildEvent",
+          required: true,
+          defaultValue: true,
+        },
+        {
+          type: "checkbox",
+          name: "createEmbedMessage",
+          required: true,
+          defaultValue: true,
+        },
+        {
+          type: "checkbox",
+          name: "mentionNotificationRoles",
+          required: true,
+          defaultValue: true,
+        },
+        {
+          name: "eventMessages",
+          type: "array",
+          fields: [
+            {
+              type: "text",
+              name: "messageId",
+              required: true,
+            },
+            {
+              type: "text",
+              name: "channelId",
+              required: true,
+            },
+          ],
+        },
+        {
+          name: "guildEvents",
+          type: "array",
+          fields: [
+            {
+              type: "text",
+              name: "eventId",
+              required: true,
+            },
+            {
+              type: "text",
+              name: "guildId",
+              required: true,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "gcal",
+      type: "group",
+      fields: [
+        {
+          name: "publishOnGCal",
+          type: "checkbox",
+          required: true,
+          defaultValue: true,
+        },
+        {
+          name: "events",
+          type: "array",
+          fields: [
+            {
+              name: "eventId",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "calendarId",
+              type: "text",
+              required: true,
+            },
+          ],
         },
       ],
     },
@@ -116,7 +187,7 @@ const Events: CollectionConfig = {
         {
           name: "university",
           type: "relationship",
-          relationTo: "universities"
+          relationTo: "universities",
         },
         {
           name: "contactName",
@@ -124,14 +195,14 @@ const Events: CollectionConfig = {
         },
         {
           name: "contactEmail",
-          type: "text"
+          type: "text",
         },
         {
           name: "formSubmission",
           type: "text",
-          index: true
-        }
-      ]
+          index: true,
+        },
+      ],
     },
     {
       name: "attendance",
@@ -141,27 +212,27 @@ const Events: CollectionConfig = {
     },
     guildEventField({
       name: "discordEvent",
-      hidden: true
+      hidden: true,
     }),
     {
-      name:"discordMessage",
+      name: "discordMessage",
       hidden: true,
       type: "group",
       fields: [
         guildChannelField({
-          name: "channel"
+          name: "channel",
         }),
         {
           name: "message",
-          type: "text"
-        }
-      ]
+          type: "text",
+        },
+      ],
     },
     {
       name: "googleCalendarId",
       type: "text",
-      hidden: true
-    }
+      hidden: true,
+    },
   ],
 };
 

@@ -1,5 +1,4 @@
 import schedule from "node-schedule";
-import { ImportEventFormJob } from "./ImportEventForm";
 
 export type Job = {
     cron: string,
@@ -7,7 +6,6 @@ export type Job = {
 }
 
 const Jobs: Job[] = [
-    ImportEventFormJob
 ]
 
 /**

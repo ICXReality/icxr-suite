@@ -1,9 +1,9 @@
+import { initializeDiscordClient } from "@djfigs1/payload-discord";
+import { Client } from "discord.js";
 import express from "express";
 import payload from "payload";
-import { ButtonStyle, Client } from "discord.js";
-import { initializeDiscordClient } from "@djfigs1/payload-discord";
-import { createButtonRowComponents, sendDiscordAuditMessage } from "./discord/bot";
-import { createVRChatSessionEmbed } from "./discord/messages";
+import { setClient } from "@xrclub/club.js/dist/discord/bot";
+import { ICXR } from "./server/icxr";
 
 require("dotenv").config();
 const app = express();
@@ -17,8 +17,10 @@ app.get("/", (_, res) => {
 payload.init({
   secret: process.env.PAYLOAD_SECRET!,
   express: app,
-  onInit: () => {
+  onInit: async () => {
     payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`);
+    await ICXR.init()
+    
     initializeDiscordClient(async () => {
       var client = new Client({
         intents: [
@@ -30,16 +32,11 @@ payload.init({
         ],
       });
 
-      client.on("ready", () => {
+      client.on("ready", c => {
+        setClient(c as any);
         console.log("Logged in as: " + client.user?.displayName);
       });
 
-      // deckard
-      client.on("messageCreate", async msg => {
-        if (msg.content == "Deckard when") {
-          await msg.channel.send("Deckаrd now!")
-        }
-      })
       return client;
     });
   },

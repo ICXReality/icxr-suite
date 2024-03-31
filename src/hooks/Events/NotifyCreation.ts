@@ -1,7 +1,8 @@
 import { AfterChangeHook } from "payload/dist/collections/config/types";
 import { Event } from "payload/generated-types";
 import { sendDiscordAuditMessage } from "../../discord/bot";
-import { createEventEmbed } from "../../discord/messages";
+import { createEventEmbed } from "@xrclub/club.js/dist/events/extensions/discord";
+import { ICXREventTransformer } from "./EventTransform";
 
 /**
  * This hook will create a notification in the audit log whenever an event is
@@ -16,7 +17,7 @@ const NotifyCreationHook: AfterChangeHook<Event> = async args => {
     if (args.operation !== "create")
         return;
 
-    let embed = createEventEmbed(args.doc);
+    let embed = await createEventEmbed(ICXREventTransformer.deserialize(args.doc));
     sendDiscordAuditMessage({content: "# New Event Created", embeds: [ embed ]})
 }
 

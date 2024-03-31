@@ -1,7 +1,8 @@
 import {
   guildChannelField,
   guildField,
-} from "@djfigs1/payload-discord/dist/fields";
+} from "@xrclub/payload-discord/dist/fields";
+import { guildRoleField } from "@xrclub/payload-discord/dist/fields/guilds";
 import { GlobalConfig } from "payload/types";
 
 const ICXR: GlobalConfig = {
@@ -26,7 +27,21 @@ const ICXR: GlobalConfig = {
           admin: {
             description: "The channel where audit messages will be sent."
           }
-        })
+        }),
+        {
+          name: "notificationRoles",
+          type: "array",
+          fields: [
+            {
+              name: "tag",
+              type: "text",
+              required: true
+            },
+            guildRoleField({
+              name: "role"
+            })
+          ]
+        }
       ],
     },
     {
